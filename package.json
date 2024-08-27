@@ -1,16 +1,28 @@
 {
     "name": "remark-heading-attrs",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "Remark plugin to support pandoc-style heading attributes",
-    "main": "dist/index.js",
-    "types": "dist/index.d.ts",
+    "exports": {
+        ".": {
+            "import": "./dist/index.js",
+            "types": "./dist/index.d.ts",
+            "default": "./dist/index.cjs"
+        },
+        "./package.json": "./package.json"
+    },
     "type": "module",
     "files": [
         "dist"
     ],
     "scripts": {
-        "build": "rm -rf dist && tsc",
-        "test": "node --test --watch tests"
+        "build": "tsup",
+        "lint": "tsc",
+        "test": "node --test",
+        "test:watch": "node --test --watch tests",
+        "check-exports": "attw --pack .",
+        "ci": "pnpm run build && pnpm run lint && pnpm run check-exports && pnpm run test",
+        "prepublishOnly": "pnpm run ci",
+        "local-release": "changeset version && changeset publish"
     },
     "keywords": [
         "remark",
@@ -24,13 +36,20 @@
     "bugs": {
         "url": "https://github.com/qiushiyan/remark-heading-attrs/issues"
     },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/qiushiyan/remark-heading-attrs.git"
+    },
     "license": "MIT",
     "devDependencies": {
+        "@arethetypeswrong/cli": "^0.15.4",
+        "@changesets/cli": "^2.27.7",
         "@types/mdast": "^4.0.4",
         "mdast": "^3.0.0",
         "mdast-util-from-markdown": "^2.0.1",
         "remark-parse": "^11.0.0",
         "remark-stringify": "^11.0.0",
+        "tsup": "^8.2.4",
         "typescript": "5.6.0-beta",
         "unified": "^11.0.5"
     },
