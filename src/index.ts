@@ -16,11 +16,12 @@ const remarkHeadingAttr = () => {
 
 			const text = textNode.value.trimEnd();
 			const matched = attributeRegex.exec(text);
-			if (!matched) {
+			if (!matched || !matched.groups || !matched.groups.attributes) {
 				return SKIP;
 			}
 
-			const { attributes } = matched.groups!;
+			const { attributes } = matched.groups;
+
 			textNode.value = text.slice(0, matched.index);
 
 			const hProperties: Record<string, any> = {};
@@ -28,31 +29,41 @@ const remarkHeadingAttr = () => {
 
 			// Extract id
 			const idMatch = idRegex.exec(attributes);
-			if (idMatch) {
-				const { id } = idMatch.groups!;
+			if (idMatch?.groups) {
+				const { id } = idMatch.groups;
 				hProperties.id = id;
 			}
 
 			// Extract classes
-			let classMatch;
-			while ((classMatch = classRegex.exec(attributes)) !== null) {
-				const { className } = classMatch.groups!;
-				classes.push(className);
+			// Extract classes
+			let classMatch: RegExpExecArray | null;
+			while (true) {
+				classMatch = classRegex.exec(attributes);
+				if (classMatch === null) break;
+				const className = classMatch.groups?.className;
+				if (className) {
+					classes.push(className);
+				}
 			}
 			if (classes.length > 0) {
 				hProperties.className = classes.join(" ");
 			}
 
 			// Extract key-value pairs
-			let keyValueMatch;
-			while ((keyValueMatch = keyValueRegex.exec(attributes)) !== null) {
-				const { key, value } = keyValueMatch.groups!;
-				const camelCaseKey = `data${toCamelCase(key)}`;
-				hProperties[camelCaseKey] = value;
+			let keyValueMatch: RegExpExecArray | null;
+			while (true) {
+				keyValueMatch = keyValueRegex.exec(attributes);
+				if (keyValueMatch === null) break;
+				const key = keyValueMatch.groups?.key;
+				const value = keyValueMatch.groups?.value;
+				if (key && value) {
+					const camelCaseKey = `data${toCamelCase(key)}`;
+					hProperties[camelCaseKey] = value;
+				}
 			}
 
 			node.data ??= {};
-			node.data;
+			// @ts-ignore
 			node.data.hProperties = hProperties;
 		});
 	};

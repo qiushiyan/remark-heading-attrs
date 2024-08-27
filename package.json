@@ -2,10 +2,10 @@
     "name": "remark-heading-attrs",
     "version": "0.0.2",
     "description": "Remark plugin to support pandoc-style heading attributes",
+    "types": "dist/index.d.ts",
     "exports": {
         ".": {
             "import": "./dist/index.js",
-            "types": "./dist/index.d.ts",
             "default": "./dist/index.cjs"
         },
         "./package.json": "./package.json"
